@@ -13,12 +13,10 @@ Built with [Tauri 2](https://tauri.app) + Lit + MobX + Vaadin. Fork of [emuell/r
 ## Features
 
 - Browse snapshots and files in local and remote restic repositories
-- Dump selected files or folders as a zip archive
 - Restore selected files or folders to a chosen location
 - Open files by moving them to TEMP and launching the system default app
 - Forget snapshots from the repository
 - Sidebar with location presets, context menu, details pane, file icons
-- Two themes (GitHub Dark / GitHub Light) toggled at runtime
 - rclone and WebDAV bridge support for remote locations
 
 ## Build from source
