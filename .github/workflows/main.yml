@@ -117,5 +117,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Restic-Browser-macos
-          path: src-tauri/target/universal-apple-darwin/release/bundle/macos/*.tar
+          path: src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app
           if-no-files-found: warn
+          
