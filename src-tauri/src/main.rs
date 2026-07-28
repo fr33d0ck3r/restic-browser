@@ -1,4 +1,4 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
+
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::{
@@ -23,17 +23,15 @@ use tauri_plugin_cli::CliExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_window_state::StateFlags;
 
-// -------------------------------------------------------------------------------------------------
 
 mod app;
+mod dep_check;
 mod restic;
 
-// -------------------------------------------------------------------------------------------------
 
-// Show given message to the user and exit the process
 fn show_message_and_exit(app: &tauri::App, message: String, exit_code: i32) -> ! {
     if initialize_console() {
-        // dump message to console
+        
         if exit_code == 0 {
             println!("{}", message);
         } else {
@@ -41,41 +39,33 @@ fn show_message_and_exit(app: &tauri::App, message: String, exit_code: i32) -> !
         }
         std::process::exit(exit_code);
     } else {
-        // else show a system dialog
+        
         app.app_handle().dialog().message(message).blocking_show();
         std::process::exit(exit_code);
     }
 }
 
-// -------------------------------------------------------------------------------------------------
 
-// Try attaching the tauri GUI app to a running console, so we can print into it.
-//
-// Returns true when running in a terminal, else false.
 fn initialize_console() -> bool {
     #[cfg(windows)]
     {
         use windows_sys::Win32::System::Console::{AttachConsole, ATTACH_PARENT_PROCESS};
-        // NB: if the app is not started from a command line this is expected to fail
+        
         let _ = unsafe { AttachConsole(ATTACH_PARENT_PROCESS) };
     }
     std::io::stdin().is_terminal()
 }
 
-// -------------------------------------------------------------------------------------------------
 
-// Try attaching the tauri GUI app to a running console, so we can print into it.
-//
-// Returns true when running in a terminal, else false.
 fn initialize_logger(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    // create term logger
+    
     let mut loggers: Vec<Box<dyn SharedLogger>> = vec![TermLogger::new(
         LevelFilter::Warn,
         Config::default(),
         TerminalMode::Mixed,
         ColorChoice::Auto,
     )];
-    // try creating a file log as well, but don't panic
+    
     let log_file_result: Result<Box<WriteLogger<std::fs::File>>, Box<dyn std::error::Error>> = {
         let log_path = app.path().app_log_dir()?;
         std::fs::create_dir_all(log_path.as_path())?;
@@ -91,19 +81,79 @@ fn initialize_logger(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>>
         Err(err) => eprintln!("Failed to create log file: {err}"),
         Ok(logger) => loggers.push(logger),
     }
-    // create combined logger
+    
     CombinedLogger::init(loggers).unwrap_or_else(|err| eprintln!("Failed to create logger: {err}"));
     Ok(())
 }
 
-// -------------------------------------------------------------------------------------------------
 
 fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    // setup term logger
+    
     initialize_logger(app)?;
 
-    // handle help/v arguments (early exit)
+    
+    dep_check::set_app_handle(app.app_handle().clone());
+
+    if let Ok(config_dir) = app.path().app_config_dir() {
+        let state_file = config_dir.join(".window-state.json");
+        if state_file.exists() {
+            log::info!("Removing stale window state file: {:?}", state_file);
+            let _ = fs::remove_file(&state_file);
+        }
+    }
+
+    
     let arg_matches = app.cli().matches()?;
+
+    
+    let verbose_mode = arg_matches.args.contains_key("verbose");
+    if verbose_mode {
+        log::info!("=== VERBOSE MODE ENABLED ===");
+        
+        log::info!("Environment variables:");
+        log::info!(
+            "  RESTIC_REPOSITORY: {}",
+            env::var("RESTIC_REPOSITORY")
+                .map(|s| if s.is_empty() {
+                    "<empty>".to_string()
+                } else {
+                    format!("<set> {}", s)
+                })
+                .unwrap_or_else(|_| "<not set>".to_string())
+        );
+        log::info!(
+            "  RESTIC_PASSWORD: {}",
+            if env::var("RESTIC_PASSWORD").is_ok() {
+                "<set> [hidden]"
+            } else {
+                "<not set>"
+            }
+        );
+        log::info!(
+            "  AWS_ACCESS_KEY_ID: {}",
+            if env::var("AWS_ACCESS_KEY_ID").is_ok() {
+                "<set> [hidden]"
+            } else {
+                "<not set>"
+            }
+        );
+        log::info!(
+            "  AWS_SECRET_ACCESS_KEY: {}",
+            if env::var("AWS_SECRET_ACCESS_KEY").is_ok() {
+                "<set> [hidden]"
+            } else {
+                "<not set>"
+            }
+        );
+        log::info!(
+            "  RESTIC_PASSWORD_FILE: {}",
+            env::var("RESTIC_PASSWORD_FILE").unwrap_or_else(|_| "<not set>".to_string())
+        );
+        log::info!(
+            "  RESTIC_PASSWORD_COMMAND: {}",
+            env::var("RESTIC_PASSWORD_COMMAND").unwrap_or_else(|_| "<not set>".to_string())
+        );
+    }
     if let Some(arg) = arg_matches.args.get("help") {
         let message = arg.value.as_str().expect("Invalid help string").to_string();
         log::info!("Dumping arg help and exiting...");
@@ -124,19 +174,19 @@ fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>
         show_message_and_exit(app, message, 0);
     }
 
-    // set PATH environment from shells in GUI apps on Linux and macOS
+    
     if let Err(err) = fix_path_env::fix() {
         log::warn!("Failed to update PATH env: {}", err);
     }
 
-    // get common bin directories on macOS
+    
     #[cfg(target_os = "macos")]
     let common_path = format!(
         "/usr/local/bin:/opt/local/bin:/opt/homebrew/bin:{}/bin",
         env::var("HOME").unwrap_or("~".into())
     );
 
-    // get restic from args or find restic in path
+    
     let mut restic_path = None;
     let mut rclone_path = None;
 
@@ -179,8 +229,18 @@ fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>
         }
     }
 
+    
+    
+    if restic_path.is_none() {
+        let msg = "Restic is not installed or not found in PATH.\n\n\
+                   Please install restic, then start the program again.\n\n\
+                   Click OK to exit.";
+        log::error!("{msg}");
+        show_message_and_exit(app, msg.to_string(), 1);
+    }
+
     #[cfg(target_os = "macos")]
-    // on macOS, try to resolve rclone path in common PATH if it can't be found in path
+    
     if rclone_path.is_none() && which(restic::RCLONE_EXECTUABLE_NAME).is_err() {
         if let Ok(rclone) = which_in(
             restic::RCLONE_EXECTUABLE_NAME,
@@ -195,7 +255,7 @@ fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>
         }
     }
 
-    // get default restic location from args or env
+    
     let mut location = restic::Location::new_from_args(
         arg_matches
             .args
@@ -207,7 +267,7 @@ fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>
         location = restic::Location::new_from_env();
     }
 
-    // create temp dir for previews
+    
     let mut temp_dir = path::Path::new(&env::temp_dir())
         .join(app.package_info().name.clone() + "_" + &process::id().to_string());
     if !temp_dir.exists() {
@@ -217,7 +277,7 @@ fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>
         }
     }
 
-    // create new app state
+    
     app.manage(app::SharedAppState::new(app::AppState::new(
         restic::Program::new(restic_path.unwrap_or_default(), rclone_path),
         location,
@@ -228,33 +288,47 @@ fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>
     Ok(())
 }
 
-// -------------------------------------------------------------------------------------------------
 
 fn finalize_app(app: &tauri::AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Closing application...");
-    // remove previews temp dir
-    let state = app.state::<app::SharedAppState>().get()?;
+    
+    
+    
+    let shared = app.state::<app::SharedAppState>();
+    shared.shutdown();
+    
+    let state = shared.get()?;
     fs::remove_dir_all(state.temp_dir())?;
     Ok(())
 }
 
-// -------------------------------------------------------------------------------------------------
+
+#[tauri::command]
+fn frontend_log(level: String, message: String) {
+    match level.as_str() {
+        "error" => log::error!("[FRONTEND] {}", message),
+        "warn" => log::warn!("[FRONTEND] {}", message),
+        _ => log::info!("[FRONTEND] {}", message),
+    }
+}
+
 
 #[tauri::command]
 fn show_app_window(app_window: tauri::Window) -> Result<(), String> {
-    // app is initially hidden until this is called to avoid screen flickering
-    // see src/hooks.ts, which invokes this on DOMContentLoaded
+    
+    
     app_window.show().map_err(|err| err.to_string())?;
+    let _ = app_window.set_focus();
     Ok(())
 }
 
-// -------------------------------------------------------------------------------------------------
 
 fn create_application() -> Result<tauri::App, Box<dyn std::error::Error>> {
     tauri::Builder::default()
         .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .setup(initialize_app)
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::Destroyed = event {
@@ -266,11 +340,15 @@ fn create_application() -> Result<tauri::App, Box<dyn std::error::Error>> {
         })
         .plugin(
             tauri_plugin_window_state::Builder::default()
-                // don't restore visibility: window is initially hidden - see show_window
-                .with_state_flags(StateFlags::all() & StateFlags::VISIBLE.complement())
+                .with_state_flags(
+                    StateFlags::all()
+                        & StateFlags::VISIBLE.complement()
+                        & StateFlags::DECORATIONS.complement(),
+                )
                 .build(),
         )
         .invoke_handler(tauri::generate_handler![
+            frontend_log,
             show_app_window,
             app::supported_repo_location_types,
             app::default_repo_location,
@@ -281,15 +359,36 @@ fn create_application() -> Result<tauri::App, Box<dyn std::error::Error>> {
             app::get_snapshots,
             app::dump_file,
             app::dump_file_to_temp,
-            app::restore_file
+            app::restore_file,
+            app::restore_files,
+            app::restore_snapshot,
+            app::forget_snapshots,
+            
+            app::get_repo_stats,
+            app::check_repository,
+            app::unlock_repository,
+            app::prune_repository,
+            
+            app::diff_snapshots,
+            app::create_backup,
+            
+            app::search_files
         ])
         .build(tauri::generate_context!())
         .map_err(Into::<Box<dyn std::error::Error>>::into)
 }
 
-// -------------------------------------------------------------------------------------------------
 
 fn main() {
+    
+    #[cfg(target_os = "linux")]
+    {
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+        
+        
+        
+    }
+
     match create_application() {
         Ok(app) => {
             app.run(|_app, _event| {});

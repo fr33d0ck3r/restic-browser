@@ -1,6 +1,6 @@
-// -------------------------------------------------------------------------------------------------
 
-/// A serializable restic snapshot, as dumped by the restic binary via `restic snapshots --json`
+
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone)]
 pub struct Snapshot {
     pub id: String,

@@ -1,6 +1,6 @@
-// -------------------------------------------------------------------------------------------------
 
-/// A serializable restic repository location type.
+
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum LocationType {
@@ -12,11 +12,10 @@ pub enum LocationType {
     MSAzure,
     Backblaze,
     GoogleCloudStorage,
+    WebDAV,
 }
 
-// -------------------------------------------------------------------------------------------------
 
-/// Additional info for a restic repository location type, as required by the frontend.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct LocationTypeInfo {
     #[serde(rename = "type")]

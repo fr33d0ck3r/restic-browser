@@ -1,15 +1,9 @@
-/** biome-ignore-all lint/complexity/useLiteralKeys: clarity */
+
 import * as mobx from "mobx";
 
 import { restic } from "../backend/restic";
 import { Location } from "./location";
 
-// -------------------------------------------------------------------------------------------------
-
-/*!
- * Represents an observable repository location preset item,
- * which basically is just a location with a display name.
- */
 
 export class LocationPreset {
   @mobx.observable
@@ -22,7 +16,7 @@ export class LocationPreset {
     mobx.makeObservable(this);
   }
 
-  // assign from JSON
+  
   fromJSON(json: any) {
     const name = (json["name"] as string) || "Untitled Preset";
     const location = new restic.Location(json["location"]);
@@ -30,7 +24,7 @@ export class LocationPreset {
     this.location.setFromResticLocation(location);
   }
 
-  // convert to JSON
+  
   toJSON(): any {
     return {
       name: this.name,
@@ -38,7 +32,7 @@ export class LocationPreset {
     };
   }
 
-  // reset all location properties
+  
   @mobx.action
   reset(): void {
     this.name = "Untitled";

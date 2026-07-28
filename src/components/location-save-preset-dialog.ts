@@ -6,19 +6,14 @@ import "@vaadin/dialog";
 import "@vaadin/horizontal-layout";
 import "@vaadin/button";
 
-// -------------------------------------------------------------------------------------------------
-
-/**
- * Modal dialog to query a name and save options for a new location preset.
- */
 
 @customElement("restic-browser-location-save-preset-dialog")
 export class ResticBrowserLocationSavePresetDialog extends LitElement {
-  // optional custom label for the password field: by default "Password".
+  
   @property()
   onClose!: (name: string, savePasswords: boolean) => boolean;
 
-  // called when the dialog's 'Cancel' button was invoked or the dialog got cancelled.
+  
   @property()
   onCancel!: () => void;
 
@@ -30,7 +25,7 @@ export class ResticBrowserLocationSavePresetDialog extends LitElement {
   constructor() {
     super();
 
-    // bind this to all callbacks
+    
     this._handleDialogClose = this._handleDialogClose.bind(this);
     this._handleDialogCancel = this._handleDialogCancel.bind(this);
   }
@@ -100,7 +95,6 @@ export class ResticBrowserLocationSavePresetDialog extends LitElement {
   }
 }
 
-// -------------------------------------------------------------------------------------------------
 
 declare global {
   interface HTMLElementTagNameMap {

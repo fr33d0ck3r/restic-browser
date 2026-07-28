@@ -3,11 +3,6 @@ import * as mobx from "mobx";
 import type { restic } from "../backend/restic";
 import { appState } from "./app-state";
 
-// -------------------------------------------------------------------------------------------------
-
-/*!
- * Represents an observable restic repository location.
- */
 
 export class Location {
   @mobx.observable
@@ -34,7 +29,7 @@ export class Location {
   constructor() {
     mobx.makeObservable(this);
 
-    // auto-update credentials and prefix on type changes
+    
     mobx.reaction(
       () => this.type,
       () => {
@@ -44,8 +39,8 @@ export class Location {
     );
   }
 
-  // get repository path with possibly cloaked password string in REST or SFTP paths.
-  // should only used for display purposes, as this malforms the path.
+  
+  
   get clokedPath(): string {
     let repositoryName = this.path;
     if (repositoryName !== "") {
@@ -67,13 +62,13 @@ export class Location {
           }
         }
       } catch (_error) {
-        // silently ignore regex errors here
+        
       }
     }
     return repositoryName;
   }
 
-  // reset all location properties
+  
   @mobx.action
   reset(): void {
     this.type = "local";
@@ -85,7 +80,7 @@ export class Location {
     this.insecureTls = false;
   }
 
-  // set location properties from some other Location
+  
   @mobx.action
   setFromOtherLocation(other: Location, copyPasswords: boolean = true): void {
     this.type = other.type;
@@ -97,15 +92,15 @@ export class Location {
     this.insecureTls = other.insecureTls;
   }
 
-  // set location properties from a restic.Location
+  
   @mobx.action
   setFromResticLocation(location: restic.Location): void {
-    // find matching location type
+    
     const locationInfo = appState.supportedLocationTypes.find((v) => v.prefix === location.prefix);
     if (!locationInfo) {
       throw Error(`Unexpected/unsupported location prefix: '${location.prefix}'`);
     }
-    // apply repository path and password
+    
     this.type = locationInfo.type;
     this.path = location.path;
     this.allowEmptyPassword = location.allowEmptyPassword;
@@ -113,7 +108,7 @@ export class Location {
     this.insecureTls = location.insecureTls;
     this._setPrefixFromType();
     this._setCredentialsFromType();
-    // set all required credentials as well, if they are valid
+    
     for (const credential of locationInfo.credentials) {
       const defaultValue = location.credentials.find((v) => v.name === credential);
       const locationValue = this.credentials.find((v) => v.name === credential);
@@ -123,14 +118,14 @@ export class Location {
     }
   }
 
-  // set prefix from the current location type
+  
   @mobx.action
   private _setPrefixFromType(): void {
     const locationInfo = appState.supportedLocationTypes.find((v) => v.type === this.type);
     this.prefix = locationInfo?.prefix || "";
   }
 
-  // set credentials from the current location type
+  
   @mobx.action
   private _setCredentialsFromType(): void {
     const locationInfo = appState.supportedLocationTypes.find((v) => v.type === this.type);

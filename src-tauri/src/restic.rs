@@ -1,20 +1,20 @@
-// -------------------------------------------------------------------------------------------------
+
 
 mod command;
 mod file;
 mod location;
 mod location_type;
 mod snapshot;
+mod webdav_bridge;
 
 pub use command::*;
 pub use file::*;
 pub use location::*;
 pub use location_type::*;
 pub use snapshot::*;
+pub use webdav_bridge::*;
 
-// -------------------------------------------------------------------------------------------------
 
-/// Currently supported location types by this backend and restic.
 pub fn supported_location_types() -> Vec<LocationTypeInfo> {
     vec![
         LocationTypeInfo::new(LocationType::Local, "", "Local Path", &[]),
@@ -23,7 +23,7 @@ pub fn supported_location_types() -> Vec<LocationTypeInfo> {
             LocationType::Rest,
             "rest",
             "REST Server",
-            &["RESTIC_REST_USERNAME", "RESTIC_REST_PASSWORD"]
+            &["RESTIC_REST_USERNAME", "RESTIC_REST_PASSWORD"],
         ),
         LocationTypeInfo::new(LocationType::RClone, "rclone", "RCLONE", &[]),
         LocationTypeInfo::new(
@@ -49,6 +49,12 @@ pub fn supported_location_types() -> Vec<LocationTypeInfo> {
             "gs",
             "Google Cloud Storage",
             &["GOOGLE_PROJECT_ID", "GOOGLE_APPLICATION_CREDENTIALS"],
+        ),
+        LocationTypeInfo::new(
+            LocationType::WebDAV,
+            "webdav",
+            "WebDAV",
+            &["WEBDAV_URL", "WEBDAV_USERNAME", "WEBDAV_PASSWORD"],
         ),
     ]
 }

@@ -1,4 +1,4 @@
-<img src="./src/assets/images/eye.png" alt="drawing" height="48px"/> <img src="./src/assets/images/logo.png" alt="drawing" height="48px"/> 
+# Restic Browser
 
 ---
 
@@ -23,8 +23,6 @@ This is not a fullblown restic backup GUI - it only allows you to *browse* exist
 * *Dumps* selected files or folders (as a zip archive) to a desired location.
 * *Restores* selected files or folders to a desired location.
 * *Opens* selected files by moving them to TEMP, then opens them with your operating system's default programs.
-
-![Screenshot](./screenshot.png "Restic Browser")
 
 
 ## Keyboard Navigation

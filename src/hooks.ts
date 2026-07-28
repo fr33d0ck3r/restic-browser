@@ -1,7 +1,10 @@
 import { core } from "@tauri-apps/api";
+import { initTheme } from "./utils/theme-manager";
 
-// workaround for vaadin with vite
-// see https://github.com/vaadin/vaadin-lumo-styles/issues/105
+
+initTheme();
+
+
 const oldDefine = customElements.define;
 customElements.define = (
   name: string,
@@ -21,7 +24,7 @@ customElements.define = (
   }
 };
 
-// disable webview context menu
+
 document.addEventListener(
   "contextmenu",
   (e) => {
@@ -31,7 +34,7 @@ document.addEventListener(
   { capture: true },
 );
 
-// make window visible as soon as we got some content to show
+
 document.addEventListener("DOMContentLoaded", () => {
   core.invoke<void>("show_app_window");
 });

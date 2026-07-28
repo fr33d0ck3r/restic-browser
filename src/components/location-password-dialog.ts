@@ -1,6 +1,6 @@
 import { dialogFooterRenderer, dialogRenderer } from "@vaadin/dialog/lit";
 import { html, LitElement } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 
 import "@vaadin/dialog";
 import "@vaadin/horizontal-layout";
@@ -8,41 +8,47 @@ import "@vaadin/vertical-layout";
 import "@vaadin/password-field";
 import "@vaadin/button";
 
-// -------------------------------------------------------------------------------------------------
-
-/**
- * Modal dialog to get a repository password from the user.
- */
 
 @customElement("restic-browser-location-password-dialog")
 export class ResticBrowserLocationPasswordDialog extends LitElement {
-  // optional custom label for the password field: by default "Password".
+  
   @property()
   label?: string;
 
-  // called when the dialog's 'Okay' button was invoked.
+  
   @property()
   onClose!: (password: string) => void;
 
-  // called when the dialog's 'Cancel' button was invoked or the dialog got cancelled.
+  
   @property()
   onCancel!: () => void;
 
+  @state()
   private _password: string = "";
+
+  @state()
   private _handledClose: boolean = false;
 
   constructor() {
     super();
 
-    // bind this to all callbacks
+    
     this._handleClose = this._handleClose.bind(this);
     this._handleCancel = this._handleCancel.bind(this);
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    
+    this._password = "";
+    this._handledClose = false;
   }
 
   render() {
     const dialogLayout = html`
       <vaadin-vertical-layout id="dialogContent">
-        <vaadin-password-field 
+        <vaadin-password-field
+          id="passwordField"
           label=${this.label || "Password"}
           style="width: 100%;"
           required
@@ -50,7 +56,11 @@ export class ResticBrowserLocationPasswordDialog extends LitElement {
           value=${this._password}
           @change=${(event: CustomEvent) => {
             this._password = (event.target as HTMLInputElement).value;
-            this._handleClose();
+          }}
+          @keydown=${(event: KeyboardEvent) => {
+            if (event.key === "Enter") {
+              this._handleClose();
+            }
           }}
         ></vaadin-password-field>
       </vaadin-vertical-layout>
@@ -96,7 +106,6 @@ export class ResticBrowserLocationPasswordDialog extends LitElement {
   }
 }
 
-// -------------------------------------------------------------------------------------------------
 
 declare global {
   interface HTMLElementTagNameMap {

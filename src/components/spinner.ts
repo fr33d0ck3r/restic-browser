@@ -1,14 +1,8 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
-import "@vaadin/icons";
-import "@vaadin/icon";
+import "./icons";
 
-import "@vaadin/vaadin-lumo-styles/vaadin-iconset.js";
-
-// -------------------------------------------------------------------------------------------------
-
-// Shows a message along with an error icon
 
 @customElement("restic-browser-spinner")
 export class ResticBrowserSpinner extends LitElement {
@@ -32,16 +26,15 @@ export class ResticBrowserSpinner extends LitElement {
 
   render() {
     return html`
-      <vaadin-icon
+      <tabler-icon
         id="spinner" 
-        icon="vaadin:spinner-third"
+        name="spinner"
         style="color: ${this.color}; width: ${this.size}; height: ${this.size}">
-      </vaadin-icon>
+      </tabler-icon>
     `;
   }
 }
 
-// -------------------------------------------------------------------------------------------------
 
 declare global {
   interface HTMLElementTagNameMap {

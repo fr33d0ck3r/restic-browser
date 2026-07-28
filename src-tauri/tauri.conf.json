@@ -29,12 +29,7 @@
     "macOS": {
       "signingIdentity": null
     },
-    "linux": {
-      "appimage": {
-        "bundleMediaFramework": false,
-        "files": {}
-      }
-    }
+    "linux": {}
   },
   "plugins": {
     "cli": {
@@ -79,6 +74,12 @@
           "name": "insecure-tls",
           "takesValue": false,
           "longDescription": "skip TLS certificate verification when connecting to the repo (insecure)"
+        },
+        {
+          "name": "verbose",
+          "short": "v",
+          "takesValue": false,
+          "longDescription": "enable verbose logging to see environment variables and debug info"
         }
       ]
     }
@@ -89,9 +90,12 @@
         "fullscreen": false,
         "height": 600,
         "width": 800,
+        "minWidth": 400,
+        "minHeight": 300,
         "resizable": true,
-        "visible": false,
+        "visible": true,
         "title": "Restic Browser",
+        "decorations": true,
         "dragDropEnabled": false
       }
     ],

@@ -16,16 +16,12 @@ import type { LocationPreset } from "../states/location-preset";
 import "@vaadin/vertical-layout";
 import "@vaadin/grid";
 import "@vaadin/button";
+import "./icons";
 
-// -------------------------------------------------------------------------------------------------
-
-/**
- * Location preset list, part of the location dialog.
- */
 
 @customElement("restic-browser-location-presets")
 export class ResticBrowserLocationPresets extends MobxLitElement {
-  // invoked when a preset item got double-clicked
+  
   @property()
   onDoubleClick!: (preset: LocationPreset) => void;
 
@@ -42,14 +38,14 @@ export class ResticBrowserLocationPresets extends MobxLitElement {
   constructor() {
     super();
 
-    // set initial selection and update on changes
+    
     mobx.autorun(() => {
       if (appState.selectedLocationPreset) {
         this._selectedItems = [appState.selectedLocationPreset];
       }
     });
 
-    // bind this to all callbacks
+    
     this._activeItemChanged = this._activeItemChanged.bind(this);
     this._handleDragStart = this._handleDragStart.bind(this);
     this._handleDragEnd = this._handleDragEnd.bind(this);
@@ -117,7 +113,7 @@ export class ResticBrowserLocationPresets extends MobxLitElement {
                     @click=${() => {
                       appState.removeLocationPreset(model.index);
                     }}>
-                      <vaadin-icon icon="vaadin:trash"></vaadin-icon>
+                      <tabler-icon name="trash"></tabler-icon>
                   </vaadin-button>`
                   : nothing
               }`,
@@ -131,12 +127,12 @@ export class ResticBrowserLocationPresets extends MobxLitElement {
 
   private _activeItemChanged(e: GridActiveItemChangedEvent<LocationPreset>) {
     const item = e.detail.value;
-    // don't deselect selected items and make sure it's a valid item
+    
     if (item && appState.locationPresets.includes(item)) {
       this._selectedItems = [item];
       appState.setSelectedLocationPreset(item);
     }
-    // double-click handling
+    
     const doubleClickItem = this._selectedItems.length ? this._selectedItems[0] : undefined;
     if (doubleClickItem) {
       if (this._selectedItemsClicked.has(doubleClickItem)) {
@@ -151,7 +147,7 @@ export class ResticBrowserLocationPresets extends MobxLitElement {
 
   private _handleDragStart(e: GridDragStartEvent<LocationPreset>) {
     const draggedItem = e.detail.draggedItems[0];
-    // Don't allow moving the "New Location" item
+    
     if (appState.locationPresets.indexOf(draggedItem) === 0) {
       e.preventDefault();
       return;
@@ -167,27 +163,26 @@ export class ResticBrowserLocationPresets extends MobxLitElement {
 
   private _handleDrop(e: GridDropEvent<LocationPreset>) {
     const { dropTargetItem, dropLocation } = e.detail;
-    // Only act when dropping on another item
+    
     if (this._draggedItem && dropTargetItem !== this._draggedItem) {
-      // Prevent dropping on the first item
+      
       if (appState.locationPresets.indexOf(dropTargetItem) === 0) {
         e.preventDefault();
         return;
       }
-      // Remove the item from its previous position
+      
       const draggedItemIndex = appState.locationPresets.indexOf(this._draggedItem);
       appState.locationPresets.splice(draggedItemIndex, 1);
-      // Re-insert the item at its new position
+      
       const dropIndex =
         appState.locationPresets.indexOf(dropTargetItem) + (dropLocation === "below" ? 1 : 0);
       appState.locationPresets.splice(dropIndex, 0, this._draggedItem);
-      // Re-assign the array to refresh the grid
+      
       appState.locationPresets = [...appState.locationPresets];
     }
   }
 }
 
-// -------------------------------------------------------------------------------------------------
 
 declare global {
   interface HTMLElementTagNameMap {

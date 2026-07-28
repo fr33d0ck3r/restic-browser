@@ -4,18 +4,14 @@ use shlex::Shlex;
 
 use crate::restic::{new_command, supported_location_types};
 
-// -------------------------------------------------------------------------------------------------
 
-/// A serializable restic location env variable.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone)]
 pub struct EnvValue {
     pub name: String,
     pub value: String,
 }
 
-// -------------------------------------------------------------------------------------------------
 
-/// A serializable restic repository location.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Location {
@@ -28,16 +24,16 @@ pub struct Location {
 }
 
 impl Location {
-    // create a new Location from the given set of optional restic arguments
-    // see tauri.conf.json for the expected args
+    
+    
     pub fn new_from_args(args: HashMap<String, Option<String>>) -> Self {
-        // normalize args
+        
         let args = args
             .into_iter()
             .map(|(k, v)| (k, v.unwrap_or_default()))
             .filter(|(_, v)| !v.is_empty())
             .collect::<HashMap<_, _>>();
-        // get repo from file or directly
+        
         let path = if let Some(repository_file) = args.get("repository-file") {
             fs::read_to_string(repository_file)
                 .unwrap_or(String::new())
@@ -49,7 +45,7 @@ impl Location {
                 .cloned()
                 .unwrap_or(String::new())
         };
-        // get password from file, command or directly
+        
         let password = if let Some(password_file) = args.get("password-file") {
             fs::read_to_string(password_file)
                 .unwrap_or(String::new())
@@ -74,9 +70,9 @@ impl Location {
                 .unwrap_or(String::new())
         };
         let allow_empty_password = false;
-        // get insecure_tls option, when set
+        
         let insecure_tls = args.contains_key("insecure-tls");
-        // build basic location
+        
         let mut location = Self {
             path,
             credentials: vec![],
@@ -85,16 +81,16 @@ impl Location {
             password,
             insecure_tls,
         };
-        // set prefix from path, when there's a path set
+        
         if !location.path.is_empty() {
             location.set_prefix_from_path();
         }
         location
     }
 
-    // create a new Location from restic specific environment values.
+    
     pub fn new_from_env() -> Self {
-        Self::new_from_args(
+        let location = Self::new_from_args(
             [
                 ("repository", "RESTIC_REPOSITORY"),
                 ("repository-file", "RESTIC_REPOSITORY_FILE"),
@@ -105,7 +101,8 @@ impl Location {
             .into_iter()
             .map(|(k, v)| (String::from(k), env::var(v).ok()))
             .collect::<HashMap<_, _>>(),
-        )
+        );
+        location
     }
 
     fn set_prefix_from_path(&mut self) {

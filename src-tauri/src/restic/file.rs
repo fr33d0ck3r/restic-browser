@@ -1,11 +1,14 @@
-// -------------------------------------------------------------------------------------------------
 
-/// A serializable restic file, as dumped by the restic binary via `restic ls --json`
+
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default, Clone)]
+#[serde(default)]
 pub struct File {
+    #[serde(default)]
     pub name: String,
-    #[serde(rename = "type")]
+    #[serde(rename = "type", default)]
     pub type_: String,
+    #[serde(default)]
     pub path: String,
     #[serde(default)]
     pub uid: i64,
@@ -22,4 +25,3 @@ pub struct File {
     #[serde(default)]
     pub ctime: String,
 }
-

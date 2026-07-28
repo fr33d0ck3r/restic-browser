@@ -19,16 +19,14 @@ import "@vaadin/button";
 import "@vaadin/select";
 import "@vaadin/notification";
 
-// -------------------------------------------------------------------------------------------------
 
-// Credential display types.
 enum CredentialDisplayType {
   Password,
   Text,
   File,
 }
 
-// Known credential display types. Defaults to "Password" when undefined.
+
 const credentialDisplayTypes: Map<string, CredentialDisplayType> = new Map([
   ["AWS_ACCESS_KEY_ID", CredentialDisplayType.Text],
   ["AZURE_ACCOUNT_NAME", CredentialDisplayType.Text],
@@ -36,26 +34,23 @@ const credentialDisplayTypes: Map<string, CredentialDisplayType> = new Map([
   ["GOOGLE_PROJECT_ID", CredentialDisplayType.Text],
   ["GOOGLE_APPLICATION_CREDENTIALS", CredentialDisplayType.File],
   ["RESTIC_REST_USERNAME", CredentialDisplayType.Text],
+  ["WEBDAV_URL", CredentialDisplayType.Text],
+  ["WEBDAV_USERNAME", CredentialDisplayType.Text],
 ]);
 
-// Dialog file filters for known file credentials. Defaults to "All files *.*".
+
 const credentialFileFilters: Map<string, DialogFilter[]> = new Map([
   ["GOOGLE_APPLICATION_CREDENTIALS", [{ name: "json", extensions: ["json"] }]],
 ]);
 
-// -------------------------------------------------------------------------------------------------
-
-/**
- * Location properties form, part of the location dialog.
- */
 
 @customElement("restic-browser-location-properties")
 export class ResticBrowserLocationProperties extends MobxLitElement {
-  // when false, all form fields are disabled
+  
   @property({ type: Boolean })
   allowEditing: boolean = true;
 
-  // get actual edited state of the location
+  
   get location(): Location {
     return this._location;
   }
@@ -67,12 +62,12 @@ export class ResticBrowserLocationProperties extends MobxLitElement {
     super();
     mobx.makeObservable(this);
 
-    // initialize from app state and auto-update on changes
+    
     mobx.autorun(() => {
       this._location.setFromOtherLocation(appState.repoLocation);
     });
 
-    // bind this to callbacks
+    
     this._browseLocalRepositoryPath = this._browseLocalRepositoryPath.bind(this);
     this._browseCredentialsPath = this._browseCredentialsPath.bind(this);
     this._readRepositoryPasswordFile = this._readRepositoryPasswordFile.bind(this);
@@ -115,6 +110,9 @@ export class ResticBrowserLocationProperties extends MobxLitElement {
       case "rest":
         pathLabel = "URL";
         break;
+      case "webdav":
+        pathLabel = "Remote Path";
+        break;
       case "s3":
       case "b2":
       case "azure":
@@ -134,7 +132,7 @@ export class ResticBrowserLocationProperties extends MobxLitElement {
           value=${this._location.path}
           @change=${mobx.action((event: CustomEvent) => {
             this._location.path = (event.target as HTMLInputElement).value.trim();
-            // ensure that the prefix is not included in the path
+            
             const prefix = locationInfo?.prefix ? `${locationInfo.prefix}:` : "";
             if (prefix !== "") {
               if (this._location.path.startsWith(prefix)) {
@@ -164,7 +162,7 @@ export class ResticBrowserLocationProperties extends MobxLitElement {
                 .disabled=${!this.allowEditing}
                 value=${value.value}
                 @change=${mobx.action((event: CustomEvent) => {
-                  // NB: don't trim passwords. Spaces are allowed here...
+                  
                   value.value = (event.target as HTMLInputElement).value;
                 })}
               ></vaadin-password-field>`;
@@ -213,7 +211,7 @@ export class ResticBrowserLocationProperties extends MobxLitElement {
           .disabled=${!this.allowEditing}
           value=${this._location.password}
           @change=${mobx.action((event: CustomEvent) => {
-            // NB: don't trim passwords. Spaces are allowed here...
+            
             this._location.password = (event.target as HTMLInputElement).value;
           })}
         >
@@ -351,7 +349,7 @@ export class ResticBrowserLocationProperties extends MobxLitElement {
             readFile(file)
               .then((fileContent) => {
                 mobx.action((fileContent: Uint8Array) => {
-                  // restic's `readText` impl supports BOM headers and also trims, so we should too
+                  
                   const textContent = decodeTextData(fileContent);
                   this._location.password = textContent.trim();
                 })(fileContent);
@@ -374,7 +372,6 @@ export class ResticBrowserLocationProperties extends MobxLitElement {
   }
 }
 
-// -------------------------------------------------------------------------------------------------
 
 declare global {
   interface HTMLElementTagNameMap {
