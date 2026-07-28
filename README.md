@@ -68,7 +68,31 @@ Restic-Browser [OPTIONS]
 -h, --help                        print help
 ```
 
-Repository and password can also be set via `RESTIC_REPOSITORY` / `RESTIC_PASSWORD` environment variables.
+Repository and password can also be set via environment variables. Restic Browser passes the full environment through to the restic binary, so any variable restic supports works here too:
+
+```bash
+RESTIC_REPOSITORY="s3:https://s3.example.com/bucket" \
+RESTIC_PASSWORD="password" \
+AWS_ACCESS_KEY_ID="key_id" \
+AWS_SECRET_ACCESS_KEY="access_key" \
+Restic-Browser
+```
+
+Supported backends and their credential variables:
+
+| Backend | Prefix | Environment variables |
+|---|---|---|
+| Local | — | — |
+| SFTP | `sftp:` | — |
+| REST server | `rest:` | `RESTIC_REST_USERNAME`, `RESTIC_REST_PASSWORD` |
+| rclone | `rclone:` | — |
+| Amazon S3 | `s3:` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` |
+| Azure Blob | `azure:` | `AZURE_ACCOUNT_NAME`, `AZURE_ACCOUNT_KEY` |
+| Backblaze B2 | `b2:` | `B2_ACCOUNT_ID`, `B2_ACCOUNT_KEY` |
+| Google Cloud | `gs:` | `GOOGLE_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS` |
+| WebDAV | `webdav:` | `WEBDAV_URL`, `WEBDAV_USERNAME`, `WEBDAV_PASSWORD` |
+
+Other recognised variables: `RESTIC_REPOSITORY_FILE`, `RESTIC_PASSWORD_FILE`, `RESTIC_PASSWORD_COMMAND`, `RESTIC_INSECURE_TLS`.
 
 ## Keyboard shortcuts
 
