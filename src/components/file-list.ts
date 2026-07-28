@@ -780,7 +780,6 @@ export class ResticBrowserFileList extends MobxLitElement {
       margin: 0px 8px;
     }
 
-    /* View toggle buttons */
     .view-toggle {
       display: flex;
       gap: 2px;
@@ -802,7 +801,6 @@ export class ResticBrowserFileList extends MobxLitElement {
       color: var(--lumo-body-text-color);
     }
 
-    /* Nav buttons */
     .nav-group {
       display: flex;
       align-items: center;
@@ -818,7 +816,6 @@ export class ResticBrowserFileList extends MobxLitElement {
       opacity: 0.5;
     }
 
-    /* Grid view styles */
     .grid-view {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -867,7 +864,6 @@ export class ResticBrowserFileList extends MobxLitElement {
       overflow: hidden;
       white-space: normal;
     }
-    /* Empty state for grid */
     .grid-empty {
       display: flex;
       flex-direction: column;
@@ -878,7 +874,6 @@ export class ResticBrowserFileList extends MobxLitElement {
       gap: 12px;
     }
 
-    /* Lasso selection */
     .lasso {
       position: absolute;
       border: 1px solid var(--lumo-primary-color);

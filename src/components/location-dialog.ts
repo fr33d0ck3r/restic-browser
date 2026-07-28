@@ -80,19 +80,15 @@ export class ResticBrowserLocationDialog extends MobxLitElement {
   }
 
   static dialogStyles: CSSResultGroup = css`
-    // #dialogContent { }
     #locationPresets {
-      margin-right: 1rem; 
+      margin-right: 1rem;
     }
-    // #locationProperties { }
     #locationPropertyButtons {
       margin-top: 1rem
     }
   `;
 
-  static footerStyles: CSSResultGroup = css`
-    // #footerContent { }
-  `;
+  static footerStyles: CSSResultGroup = css``;
 
   render() {
     

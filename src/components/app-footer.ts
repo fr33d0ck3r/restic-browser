@@ -138,7 +138,6 @@ export class ResticBrowserAppFooter extends MobxLitElement {
     .snapshot-date:hover {
       color: var(--lumo-primary-text-color);
     }
-    /* Confirm dialog overlay */
     .confirm-overlay {
       position: fixed;
       inset: 0;

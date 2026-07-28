@@ -228,7 +228,6 @@ export class ResticBrowserSnapshotList extends MobxLitElement {
       scrollbar-gutter: stable;
     }
 
-    /* Confirm dialog overlay */
     .confirm-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;

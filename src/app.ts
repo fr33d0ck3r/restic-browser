@@ -68,7 +68,6 @@ export class ResticBrowserApp extends MobxLitElement {
       height: 100vh;
       overflow: hidden;
     }
-    /* Dialog overlay theming */
     ::slotted(vaadin-dialog-overlay),
     vaadin-dialog-overlay {
       --lumo-overlay-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
