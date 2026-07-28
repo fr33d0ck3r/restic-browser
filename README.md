@@ -16,8 +16,10 @@ Built with [Tauri 2](https://tauri.app) + Lit + MobX + Vaadin. Fork of [emuell/r
 - Dump selected files or folders as a zip archive
 - Restore selected files or folders to a chosen location
 - Open files by moving them to TEMP and launching the system default app
-- Two themes (GitHub Dark / GitHub Light) toggled at runtime
+- Forget snapshots from the repository
 - Sidebar with location presets, context menu, details pane, file icons
+- Two themes (GitHub Dark / GitHub Light) toggled at runtime
+- rclone and WebDAV bridge support for remote locations
 
 ## Build from source
 
@@ -68,16 +70,17 @@ Restic-Browser [OPTIONS]
 -h, --help                        print help
 ```
 
+Repository and password can also be set via `RESTIC_REPOSITORY` / `RESTIC_PASSWORD` environment variables.
+
 ## Keyboard shortcuts
 
 - `Ctrl+O` — open repository dialog
 - `Ctrl+S` — open snapshots dialog
 - `Ctrl+?` — show keyboard help
+- `Esc` — close dialogs
 - `Arrows / PageUp / PageDown / Home / End` — navigate lists
 - `Enter / Space` — open selected file or folder
-- `Backspace` — go to parent folder
-- `d` — dump selection as zip
-- `r` — restore selection
+- `Ctrl+A` — select all files
 
 ## License
 
