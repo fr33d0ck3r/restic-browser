@@ -7,6 +7,7 @@ Built with [Tauri 2](https://tauri.app) + Lit + MobX + Vaadin. Fork of [emuell/r
 ## Screenshots
 
 ![Main window](docs/screenshots/main.png)
+![Snapshots dialog](docs/screenshots/snapshots-dialog.png)
 ![Keyboard shortcuts overlay](docs/screenshots/keyboard-shortcuts.png)
 
 ## Features
