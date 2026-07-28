@@ -4,6 +4,11 @@ Cross-platform GUI for browsing and restoring [restic](https://github.com/restic
 
 Built with [Tauri 2](https://tauri.app) + Lit + MobX + Vaadin. Fork of [emuell/restic-browser](https://github.com/emuell/restic-browser).
 
+## Screenshots
+
+![Main window](docs/screenshots/main.png)
+![Keyboard shortcuts overlay](docs/screenshots/keyboard-shortcuts.png)
+
 ## Features
 
 - Browse snapshots and files in local and remote restic repositories
