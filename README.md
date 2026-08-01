@@ -48,8 +48,6 @@ The `deps-system` target supports apt (Debian/Ubuntu), dnf (Fedora), and pacman 
 
 **Windows:** Windows 10+ with [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/).
 
-**macOS:** 10.13+.
-
 ## CLI arguments
 
 ```

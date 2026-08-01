@@ -84,39 +84,3 @@ jobs:
           name: Restic-Browser-windows
           path: src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: warn
-
-  build-macos:
-    name: macOS
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/Jod
-          cache: npm
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-apple-darwin,x86_64-apple-darwin
-
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: ./src-tauri -> target
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build universal binary
-        run: npm run tauri build -- --target universal-apple-darwin
-
-      - name: Upload app
-        uses: actions/upload-artifact@v7
-        with:
-          name: Restic-Browser-macos
-          path: src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app
-          if-no-files-found: warn
-          

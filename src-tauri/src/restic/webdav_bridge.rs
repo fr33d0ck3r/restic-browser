@@ -180,8 +180,11 @@ fn write_temp_conf(url: &str, user: &str, obscured_pass: &str) -> Result<PathBuf
         "[webdav]\ntype = webdav\nurl = {url}\nvendor = other\nuser = {user}\npass = {obscured_pass}\n"
     );
     let mut f = fs::File::create(&path).map_err(|e| format!("create conf: {e}"))?;
-    use std::os::unix::fs::PermissionsExt;
-    let _ = f.set_permissions(fs::Permissions::from_mode(0o600));
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let _ = f.set_permissions(fs::Permissions::from_mode(0o600));
+    }
     f.write_all(conf.as_bytes()).map_err(|e| format!("write conf: {e}"))?;
     Ok(path)
 }

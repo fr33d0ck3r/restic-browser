@@ -26,9 +26,6 @@
         "type": "downloadBootstrapper"
       }
     },
-    "macOS": {
-      "signingIdentity": null
-    },
     "linux": {}
   },
   "plugins": {
