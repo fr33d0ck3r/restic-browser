@@ -12,7 +12,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "appimage"],
+    "targets": ["app", "appimage", "nsis"],
     "category": "DeveloperTool",
     "copyright": "",
     "shortDescription": "",
