@@ -5,7 +5,8 @@ SHELL := /bin/bash
 NAME := restic-browser
 VERSION := $(shell grep '"version"' package.json | head -1 | sed 's/.*": "\(.*\)".*/\1/')
 ARCH := $(shell dpkg --print-architecture 2>/dev/null || echo amd64)
-BUILD_DIR := src-tauri/target/release
+CARGO_TARGET_DIR ?= /tmp/restic-browser-target
+BUILD_DIR := $(CARGO_TARGET_DIR)/release
 BINARY_NAME := Restic-Browser
 DESTDIR :=
 PREFIX := /usr
@@ -16,6 +17,7 @@ CARGO_HOME ?= $(HOME)/.cargo
 
 export RUSTFLAGS := -C linker=clang -C link-arg=-fuse-ld=mold
 export TAURI_DEBUG := 1
+export CARGO_TARGET_DIR
 
 APT_PACKAGES := \
   build-essential \
@@ -44,6 +46,9 @@ help:
 	@echo "  make uninstall   Remove binary"
 	@echo "  make clean       Remove build artifacts"
 	@echo "  make help        Show this message"
+	@echo ""
+	@echo "Variables:"
+	@echo "  CARGO_TARGET_DIR=$(CARGO_TARGET_DIR)  (override with: make CARGO_TARGET_DIR=/path)"
 
 deps: deps-system deps-node deps-rust
 	@echo "=== All dependencies installed ==="
@@ -125,5 +130,6 @@ uninstall:
 
 clean:
 	@echo "=== Cleaning build artifacts ==="
-	rm -rf dist/ bin/ src-tauri/target/ node_modules/.vite/
+	rm -rf dist/ bin/ node_modules/.vite/
+	rm -rf "$(CARGO_TARGET_DIR)"
 	find . -name "*.db" -type f -delete 2>/dev/null || true

@@ -12,6 +12,8 @@ jobs:
   build-linux:
     name: Linux (AppImage)
     runs-on: ubuntu-22.04
+    env:
+      CARGO_TARGET_DIR: /tmp/restic-browser-target
     steps:
       - uses: actions/checkout@v6
 
@@ -29,8 +31,8 @@ jobs:
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
-        with:
-          workspaces: ./src-tauri -> target
+        env:
+          CARGO_TARGET_DIR: /tmp/restic-browser-target
 
       - name: Install npm dependencies
         run: npm ci
@@ -76,7 +78,7 @@ jobs:
         with:
           name: Restic-Browser-windows
           path: src-tauri/target/release/bundle/nsis/*.exe
-          if-no-files-found: warn
+          if-no-files-found: error
 
   release:
     name: Create release
