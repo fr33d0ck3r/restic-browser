@@ -131,5 +131,10 @@ uninstall:
 clean:
 	@echo "=== Cleaning build artifacts ==="
 	rm -rf dist/ bin/ node_modules/.vite/
-	rm -rf "$(CARGO_TARGET_DIR)"
+	@if [ -n "$(CARGO_TARGET_DIR)" ] && echo "$(CARGO_TARGET_DIR)" | grep -Eq '^/tmp/|^\.(\./)?'; then \
+	  rm -rf "$(CARGO_TARGET_DIR)"; \
+	else \
+	  echo "Refusing to rm CARGO_TARGET_DIR=$(CARGO_TARGET_DIR) (not under /tmp/ or relative)"; \
+	  exit 1; \
+	fi
 	find . -name "*.db" -type f -delete 2>/dev/null || true
